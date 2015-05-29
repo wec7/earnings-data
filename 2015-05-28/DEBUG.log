@@ -1,0 +1,41 @@
+INFO:root:Start to get SPR symbols
+INFO:root:Start to get SP400 symbols
+INFO:root:Succeed to get sp400 symbols
+INFO:root:Start to get SP500 symbols
+INFO:root:Succeed to get sp500 symbols
+INFO:root:Start to get SP600 symbols
+INFO:root:Succeed to get sp600 symbols
+INFO:root:Succeed to get spr symbols
+INFO:root:Start to get SPR symbols
+INFO:root:Use cached SPR symbols
+INFO:root:Start to get SPR symbols
+INFO:root:Use cached SPR symbols
+DEBUG:root:Failed List: A, AA, AAN, AAP, AAPL, AAWW, ABAX, ABC, ABMD, ABT, ACC, ACET, ACM, ACN, ACOR, ACT, ACXM, ADI, ADM, ADS, ADSK, AEGN, AEP, ANSS, AVP, AVY, AWR, AXE, AXP, AZZ, B, BANR, BCO, BEN, BGG, BH, BJRI, BKH, BMS, BOFI, BRCM, BRLI, BTU, BWLD, BWS, BXS, CA, CAB, CAH, CAMP, CAS, CASY, CATM, CBB, CBG, CBR, CDNS, CHK, CHRW, CHS, CIR, CKH, CL, CLC, CLD, CLF, CLGX, CLI, CLMS, CLX, CMA, CMCSA, CME, CMI, CMN, CNC, CNK, CNL, CNP, COL, COLB, COO, COP, COR, COST, CPB, CPRT, CPSI, CRL, CROX, CRR, CRVL, CTAS, CY, CYH, CYN, DD, DDD, DF, DG, DLTR, DLX, DNR, DTV, DW, EA, EBAY, EBIX, EBS, ECL, ECPG, EFX, EGL, EGP, EIG, EL, ELY, EMC, EME, EMN, EMR, ENDP, ENS, EPAY, EQIX, EQR, EQY, ESL, ESRX, ETFC, ETN, ETR, EV, EXC, EXH, EXP, EXPD, EXPO, EZPW, FARO, FB, FBP, FCF, FCFS, FDO, FIX, FL, FLS, FMBI, FNFG, FRAN, FTNT, FUL, GB, GEO, GHL, GIS, GLT, GM, GMCR, GME, GMT, GOOG, GOV, GPN, GPRE, GVA, GWW, HAE, HAFC, HAS, HBHC, HCA, HCP, HGR, HMN, HOT, HRS, HSY, HTLD, HUM, HWKN, IDA, IIVI, IPG, ITT, ITW, JBL, JNJ, JNPR, JNS, KAMN, KBH, KEY, KFY, KMPR, KORS, KR, LDL, LECO, LFUS, LG, LII, LMNX, LXP, MCS, MDCO, MOV, MTX, MWW, MYL, NCI, NOC, NPK, OGE, OMC, OMG, ORN, PERY, PETS, PFE, PG, PKG, PLKI, PRSC, PTEN, PX, RE, RECN, RF, RGLD, RHI, RSG, SAFM, SMTC, SPTN, TDW, TIF, TNGO, TOL, TRN, TSO, TUP, VAL, VLY, VMC, VMI, VNO, VOXX, WFM, WHR, WIRE, WMB, WOR
+INFO:apscheduler.executors.default:Job "scheduled_job (trigger: cron[day_of_week='mon-fri', hour='11', minute='8'], next run at: 2015-05-29 11:08:00 EDT)" executed successfully
+INFO:root:Start to get SPR symbols
+INFO:root:Use cached SPR symbols
+DEBUG:root:Failed List: BWS, CHS, COST, CPRT, ENS, KORS, MOV, PLKI, SMTC, SPTN, TDW, TIF, TOL, VAL
+INFO:root:Start to get SPR symbols
+INFO:root:Use cached SPR symbols
+INFO:root:Use cached SPR symbols
+DEBUG:root:Failed to download PLKI
+INFO:root:KORS downloaded successfully
+INFO:root:MOV downloaded successfully
+DEBUG:root:Failed to download ENS
+DEBUG:root:Failed to download SPTN
+DEBUG:root:Failed to download TDW
+DEBUG:root:Failed to download SMTC
+DEBUG:root:Failed to download CPRT
+INFO:root:CHS downloaded successfully
+INFO:root:TOL downloaded successfully
+DEBUG:root:Failed to download COST
+INFO:root:TIF downloaded successfully
+INFO:root:VAL downloaded successfully
+DEBUG:root:Failed List: COST, CPRT, ENS, PLKI, SMTC, SPTN, TDW
+INFO:root:Use cached SPR symbols
+INFO:root:PLKI downloaded successfully
+INFO:root:ENS downloaded successfully
+INFO:root:SPTN downloaded successfully
+INFO:root:CPRT downloaded successfully
+INFO:root:SMTC downloaded successfully
+INFO:root:TDW downloaded successfully
