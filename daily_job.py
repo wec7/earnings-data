@@ -13,7 +13,7 @@ def main():
 
     sched = BlockingScheduler()
 
-    @sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
+    @sched.scheduled_job('cron', day_of_week='mon-sat', hour=23)
     def scheduled_job():
     	print('[INFO] Job started.')
         get_busystock_earnings()
