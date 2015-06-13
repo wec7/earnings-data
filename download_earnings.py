@@ -7,6 +7,7 @@ Description: automatic process to get stock before/after close price around surp
 import numpy as np
 import pandas as pd
 import datetime as dt
+import sys
 import os
 import bisect
 
@@ -25,10 +26,6 @@ from multiprocessing import Pool
 
 # Logging
 import logging
-
-# Global variables
-JOB_DATE = dt.date.today()
-
 
 def make_dir(date):
     '''
@@ -75,11 +72,11 @@ def get_index_symbols(date, index='spr', use_cache=True):
         df_spr = df_sp400.append(df_sp500).append(df_sp600)
         df_spr = df_spr.sort('Symbol').set_index('Symbol')
         df_spr.to_csv(s_symbol_path)
-        logging.info(index.upper() + ' symbols downloaded successfully')
+        logging.info('\t' + index.upper() + '\tsymbols downloaded successfully')
         return df_spr
 
     else:
-        logging.debug('Failed to get '+index+' symbols')
+        logging.debug('\t' + index.upper() + '\tfailed to download')
 
 
 def get_quandl_earnings(date, use_cache=True):
@@ -152,15 +149,14 @@ def get_quandl_earnings(date, use_cache=True):
         df_earnings['AFTER_CLOSE']  = ls_next_close
         
         # save into csv
-        df_earnings = df_earnings
-        df_earnings.to_csv(s_equity_path)
+        df_earnings.to_csv(s_equity_path, date_format='%Y%m%d')
 
 
 def get_stock_earnings(s_equity):
     ''' Derive earnings history for each equity ''' 
     try:
         # database for equity, if exists then skip
-        date = JOB_DATE
+        date = dt.date.today()
         s_equity_path = make_dir(date) + '/' + s_equity + '.csv'
         if os.path.isfile(s_equity_path):
             return True
@@ -172,10 +168,10 @@ def get_stock_earnings(s_equity):
         
         # parse raw data into a dataframe
         treeElem_root = ET.fromstring('<table>'+bt_raw.split('<table>')[1].split('</table>')[0]+'</table>',parser=etree.XMLParser(recover=True))
-        ls_earning_date = []
-        ls_time         = []
-        ls_eps_est      = []
-        ls_eps_act      = []
+        ls_earning_date   = []
+        ls_time           = []
+        ls_eps_est        = []
+        ls_eps_act        = []
         for treeElem_child1 in treeElem_root[1:]:
             ls_earning_date.append(dt.datetime.strptime(treeElem_child1[0][0].text, '%Y-%m-%d').date())
             ls_time.append(treeElem_child1[1].text)
@@ -187,13 +183,14 @@ def get_stock_earnings(s_equity):
                 ls_eps_act.append(float(treeElem_child1[4].text))
             except TypeError:
                 ls_eps_act.append(None)
-        df_earnings = pd.DataFrame({'Earning Date': ls_earning_date, 'Time': ls_time, 'EPS-e': ls_eps_est, 'EPS-a': ls_eps_act})
+        df_earnings = pd.DataFrame({'EarningDate': ls_earning_date, 'Time': ls_time, 'EPS-E': ls_eps_est, 'EPS-A': ls_eps_act})
 
         # construct Prev Close and Next Close column in df_earnings
-        ls_prev_close  = []
-        ls_next_close  = []
-        ls_pprev_close = []
-        ls_nnext_close = []
+        ls_reference_date = []
+        ls_prev_close     = []
+        ls_next_close     = []
+        ls_pprev_close    = []
+        ls_nnext_close    = []
 
         if len(df_earnings) != 0:
             # get adjusted close data from Yahoo Finance
@@ -206,6 +203,7 @@ def get_stock_earnings(s_equity):
 
                 # yahoo finance does not have data as early as earning date
                 if i_date == 0:
+                    ls_reference_date.append(None)
                     ls_pprev_close.append(None)
                     ls_prev_close.append(None)
                     ls_next_close.append(None)
@@ -215,14 +213,17 @@ def get_stock_earnings(s_equity):
                     ls_prev_close.append(df_close[i_date-1])
                     try:
                         ls_next_close.append(df_close[i_date])
+                        ls_reference_date.append(ls_close_date[i_date])
                     except IndexError:
                         ls_next_close.append(None)
+                        ls_reference_date.append(None)
                     try:
                         ls_nnext_close.append(df_close[i_date+1])
                     except IndexError:
                         ls_nnext_close.append(None)
 
                 elif s_time == 'BMO':
+                    ls_reference_date.append(dt_date)
                     ls_pprev_close.append(df_close[i_date-3])
                     ls_prev_close.append(df_close[i_date-2])
                     ls_next_close.append(df_close[i_date-1])
@@ -233,21 +234,32 @@ def get_stock_earnings(s_equity):
                 else:
                     raise TypeError('Earning Annouce Time Missing.')
 
-        df_earnings['PPrev Close'] = ls_pprev_close
-        df_earnings['Prev Close']  = ls_prev_close
-        df_earnings['Next Close']  = ls_next_close
-        df_earnings['NNext Close'] = ls_nnext_close
+        df_earnings['ReferenceDate'] = ls_reference_date
+        df_earnings['PPrevClose']    = ls_pprev_close
+        df_earnings['PrevClose']     = ls_prev_close
+        df_earnings['NextClose']     = ls_next_close
+        df_earnings['NNextClose']    = ls_nnext_close
+
+        # convert date format
+        df_earnings['EarningDate']   = [date.strftime('%Y%m%d') for date in df_earnings['EarningDate']]
+        df_earnings['ReferenceDate'] = [date.strftime('%Y%m%d') if date != None else None for date in df_earnings['ReferenceDate']]
         
         # save into csv
-        df_earnings = df_earnings.set_index('Earning Date')
-        df_earnings.to_csv(s_equity_path)
+        df_earnings = df_earnings[['EarningDate', 'Time', 'ReferenceDate', 'PPrevClose', 'PrevClose', 'NextClose', 'NNextClose']]
+        df_earnings = df_earnings.set_index('EarningDate').fillna('NaN')
+        df_earnings.to_csv(s_equity_path,date_format='%Y%m%d')
 
         # Logging
-        logging.info(s_equity + ' downloaded successfully')
+        if len(df_earnings) != 0:
+            logging.info('\t' + s_equity + '\tdownloaded successfully')
+        else:
+            logging.info('\t' + s_equity + '\tmissing history')
+        
         return True
 
     except:
-        logging.debug('Failed to download ' + s_equity)
+        logging.debug('\t' + s_equity + '\tfailed to download')
+        print s_equity, '\t', sys.exc_info()[0]
         return False
 
 
@@ -278,11 +290,9 @@ def get_busystock_earnings(date=None, use_cache=True):
 
     # Logging
     ls_failed = [ls_spr[i] for i, b_success in enumerate(ls_signals) if b_success==False]
-    if len(ls_failed) > 0:
-        logging.debug('Failed List: ' + ', '.join(ls_failed))
-
+    logging.debug('\tFailed List:\t' + '\t'.join(ls_failed))
 
 
 if __name__ == '__main__':
-    get_busystock_earnings(JOB_DATE)
-    #get_stock_earnings('COST')
+    #get_busystock_earnings()
+    get_stock_earnings('NWSA')

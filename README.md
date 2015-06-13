@@ -54,5 +54,5 @@ Make sure your system meets these requirements:
   cd ~/Dropbox/Earnings
   python daily_job.py
   ```
-  
-  Never close it, it will run at 17pm every weekday.
+
+  Never close it, it will run at 11pm from Monday to Saturday.
